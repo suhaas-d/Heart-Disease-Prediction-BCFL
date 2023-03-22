@@ -12,7 +12,7 @@ from sys import getsizeof
 # https://cryptobook.nakov.com/digital-signatures/rsa-sign-verify-examples
 from Crypto.PublicKey import RSA
 from hashlib import sha256
-from Models import Mnist_2NN, Mnist_CNN
+from Models import Mnist_2NN, Mnist_CNN, BRFSS_NN, LogisticRegression
 from Blockchain import Blockchain
 
 class Device:
@@ -27,6 +27,8 @@ class Device:
 		self.net = copy.deepcopy(net)
 		if opti == "SGD":
 			self.opti = optim.SGD(self.net.parameters(), lr=learning_rate)
+		elif opti == 'Adam':
+			self.opti = optim.Adam(self.net.parameters(), lr=learning_rate)
 		self.dev = dev
 		# in real system, new data can come in, so train_dl should get reassigned before training when that happens
 		self.train_dl = DataLoader(self.train_ds, batch_size=self.local_batch_size, shuffle=True)
@@ -702,6 +704,8 @@ class Device:
 			for data, label in self.train_dl:
 				data, label = data.to(self.dev), label.to(self.dev)
 				preds = self.net(data)
+				#for BRFSS
+				# preds = torch.round(preds)
 				loss = self.loss_func(preds, label)
 				loss.backward()
 				self.opti.step()
@@ -740,10 +744,14 @@ class Device:
 			# by default use SGD. Did not implement others
 			if opti == 'SGD':
 				validation_opti = optim.SGD(validation_net.parameters(), lr=currently_used_lr)
+			elif opti == 'Adam':
+				validation_opti = optim.Adam(validation_net.parameters(), lr=currently_used_lr)
 			local_update_time = time.time()
 			for data, label in self.train_dl:
 				data, label = data.to(self.dev), label.to(self.dev)
 				preds = validation_net(data)
+				#for BRFSS
+				# preds = torch.round(preds)
 				loss = self.loss_func(preds, label)
 				loss.backward()
 				validation_opti.step()
@@ -804,10 +812,12 @@ class Device:
 			for data, label in self.test_dl:
 				data, label = data.to(self.dev), label.to(self.dev)
 				preds = self.net(data)
-				preds = torch.argmax(preds, dim=1)
-				sum_accu += (preds == label).float().mean()
+				#uncomment for MNIST
+				# arg_preds = torch.argmax(preds, dim=1)
+				roundpreds = torch.round(preds)
+				sum_accu += (roundpreds == label).float().mean()
 				num += 1
-				
+			# print(preds)
 			return sum_accu / num
 
 
@@ -833,6 +843,9 @@ class Device:
 			for var in self.global_parameters:
 				self.global_parameters[var] = (sum_parameters[var] / num_participants)
 			print(f"global updates done by {self.idx}")
+			self.net.load_state_dict(self.global_parameters, strict=True)
+			print("********************************** SAVING NEW GLOBAL MODEL *******************************************")
+			torch.save(self.net.state_dict(), 'Global_Model.pt')
 		else:
 			print(f"There are no available local params for {self.idx} to perform global updates in this comm round.")
 		
@@ -1231,10 +1244,14 @@ class Device:
 			# by default use SGD. Did not implement others
 			if opti == 'SGD':
 				validation_opti = optim.SGD(updated_net.parameters(), lr=currently_used_lr)
+			elif opti == 'Adam':
+				validation_opti = optim.Adam(updated_net.parameters(), lr=currently_used_lr)
 			local_validation_time = time.time()
 			for data, label in self.train_dl:
 				data, label = data.to(self.dev), label.to(self.dev)
 				preds = updated_net(data)
+				#for BRFSS
+				# preds = torch.round(preds)
 				loss = self.loss_func(preds, label)
 				loss.backward()
 				validation_opti.step()
@@ -1246,9 +1263,13 @@ class Device:
 				for data, label in self.test_dl:
 					data, label = data.to(self.dev), label.to(self.dev)
 					preds = updated_net(data)
-					preds = torch.argmax(preds, dim=1)
-					sum_accu += (preds == label).float().mean()
+					#uncomment for MNIST
+					# preds = torch.argmax(preds, dim=1)
+					#for BRFSS
+					roundpreds = torch.round(preds)
+					sum_accu += (roundpreds == label).float().mean()
 					num += 1
+				# print(preds)
 			self.validator_local_accuracy = sum_accu / num
 			print(f"validator {self.idx} locally updated model has accuracy {self.validator_local_accuracy} on its local test set")
 			return (time.time() - local_validation_time)/self.computation_power
@@ -1376,27 +1397,29 @@ class DevicesInNetwork(object):
 	# distribute the dataset evenly to the devices
 	def data_set_balanced_allocation(self):
 		# read dataset
-		mnist_dataset = DatasetLoad(self.data_set_name, self.is_iid)
+		dataset = DatasetLoad(self.data_set_name, self.is_iid)
 		
 		# perpare training data
-		train_data = mnist_dataset.train_data
-		train_label = mnist_dataset.train_label
+		train_data = dataset.train_data
+		train_label = dataset.train_label
 		# shard dataset and distribute among devices
 		# shard train
-		shard_size_train = mnist_dataset.train_data_size // self.num_devices // 2
-		shards_id_train = np.random.permutation(mnist_dataset.train_data_size // shard_size_train)
+		shard_size_train = dataset.train_data_size // self.num_devices // 2
+		shards_id_train = np.random.permutation(dataset.train_data_size // shard_size_train)
 
 		# perpare test data
 		if not self.shard_test_data:
-			test_data = torch.tensor(mnist_dataset.test_data)
-			test_label = torch.argmax(torch.tensor(mnist_dataset.test_label), dim=1)
+			test_data = torch.tensor(dataset.test_data)
+			#uncomment for MNIST
+			# test_label = torch.argmax(torch.tensor(dataset.test_label), dim=1)
+			test_label = torch.tensor(dataset.test_label)
 			test_data_loader = DataLoader(TensorDataset(test_data, test_label), batch_size=100, shuffle=False)
 		else:
-			test_data = mnist_dataset.test_data
-			test_label = mnist_dataset.test_label
+			test_data = dataset.test_data
+			test_label = dataset.test_label
 			# shard test
-			shard_size_test = mnist_dataset.test_data_size // self.num_devices // 2
-			shards_id_test = np.random.permutation(mnist_dataset.test_data_size // shard_size_test)
+			shard_size_test = dataset.test_data_size // self.num_devices // 2
+			shards_id_test = np.random.permutation(dataset.test_data_size // shard_size_test)
 		
 		malicious_nodes_set = []
 		if self.num_malicious:
@@ -1413,7 +1436,8 @@ class DevicesInNetwork(object):
 			label_shards1 = train_label[shards_id_train1 * shard_size_train: shards_id_train1 * shard_size_train + shard_size_train]
 			label_shards2 = train_label[shards_id_train2 * shard_size_train: shards_id_train2 * shard_size_train + shard_size_train]
 			local_train_data, local_train_label = np.vstack((data_shards1, data_shards2)), np.vstack((label_shards1, label_shards2))
-			local_train_label = np.argmax(local_train_label, axis=1)
+			#uncomment for MNIST
+			# local_train_label = np.argmax(local_train_label, axis=1)
 			# distribute test data
 			if self.shard_test_data:
 				shards_id_test1 = shards_id_test[i * 2]
@@ -1423,7 +1447,8 @@ class DevicesInNetwork(object):
 				label_shards1 = test_label[shards_id_test1 * shard_size_test: shards_id_test1 * shard_size_test + shard_size_test]
 				label_shards2 = test_label[shards_id_test2 * shard_size_test: shards_id_test2 * shard_size_test + shard_size_test]
 				local_test_data, local_test_label = np.vstack((data_shards1, data_shards2)), np.vstack((label_shards1, label_shards2))
-				local_test_label = torch.argmax(torch.tensor(local_test_label), dim=1)
+				#Uncomment for MNIST
+				# local_test_label = torch.argmax(torch.tensor(local_test_label), dim=1)
 				test_data_loader = DataLoader(TensorDataset(torch.tensor(local_test_data), torch.tensor(local_test_label)), batch_size=100, shuffle=False)
 			# assign data to a device and put in the devices set
 			if i in malicious_nodes_set:

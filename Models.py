@@ -38,3 +38,25 @@ class Mnist_CNN(nn.Module):
 		tensor = self.fc2(tensor)
 		return tensor
 
+class LogisticRegression(nn.Module):
+    def __init__(self):
+        super(LogisticRegression, self).__init__()
+        self.linear = nn.Linear(17, 1)
+
+    def forward(self, x):
+        output = torch.sigmoid(self.linear(x))
+        return output
+
+class BRFSS_NN(nn.Module):
+    def __init__(self):
+        super(BRFSS_NN, self).__init__()
+        self.layer1 = nn.Linear(17, 64)
+        self.layer2 = nn.Linear(64, 32)
+        self.layer3 = nn.Linear(32, 1)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        x = self.relu(self.layer1(x))
+        x = self.relu(self.layer2(x))
+        x = self.layer3(x)
+        return torch.sigmoid(x)

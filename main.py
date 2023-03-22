@@ -34,7 +34,7 @@ from pathlib import Path
 import shutil
 import torch
 import torch.nn.functional as F
-from Models import Mnist_2NN, Mnist_CNN
+from Models import Mnist_2NN, Mnist_CNN, BRFSS_NN, LogisticRegression
 from Device import Device, DevicesInNetwork
 from Block import Block
 from Blockchain import Blockchain
@@ -59,6 +59,7 @@ parser.add_argument('-sf', '--save_freq', type=int, default=5, help='save freque
 parser.add_argument('-sm', '--save_most_recent', type=int, default=2, help='in case of saving space, keep only the recent specified number of snapshops; 0 means keep all')
 
 # FL attributes
+parser.add_argument('-dataset', '--dataset', type=str, default='brfss', help='dataset to train on')
 parser.add_argument('-B', '--batchsize', type=int, default=10, help='local train batch size')
 parser.add_argument('-mn', '--model_name', type=str, default='mnist_cnn', help='the model to train')
 parser.add_argument('-lr', "--learning_rate", type=float, default=0.01, help="learning rate, use value from origin paper as default")
@@ -220,6 +221,11 @@ if __name__=="__main__":
 			net = Mnist_2NN()
 		elif args['model_name'] == 'mnist_cnn':
 			net = Mnist_CNN()
+		elif args['model_name'] == 'BRFSS_NN':
+			net = BRFSS_NN()
+		elif args['model_name'] == 'LogisticRegression':
+			net = LogisticRegression()
+
 
 		# 7. assign GPU(s) if available to the net, otherwise CPU
 		# os.environ['CUDA_VISIBLE_DEVICES'] = args['gpu']
@@ -229,10 +235,11 @@ if __name__=="__main__":
 		net = net.to(dev)
 
 		# 8. set loss_function
-		loss_func = F.cross_entropy
+		# loss_func = F.
+		loss_func = torch.nn.BCELoss()
 
 		# 9. create devices in the network
-		devices_in_network = DevicesInNetwork(data_set_name='mnist', is_iid=args['IID'], batch_size = args['batchsize'], learning_rate =  args['learning_rate'], loss_func = loss_func, opti = args['optimizer'], num_devices=num_devices, network_stability=args['network_stability'], net=net, dev=dev, knock_out_rounds=args['knock_out_rounds'], lazy_worker_knock_out_rounds=args['lazy_worker_knock_out_rounds'], shard_test_data=args['shard_test_data'], miner_acception_wait_time=args['miner_acception_wait_time'], miner_accepted_transactions_size_limit=args['miner_accepted_transactions_size_limit'], validator_threshold=args['validator_threshold'], pow_difficulty=args['pow_difficulty'], even_link_speed_strength=args['even_link_speed_strength'], base_data_transmission_speed=args['base_data_transmission_speed'], even_computation_power=args['even_computation_power'], malicious_updates_discount=args['malicious_updates_discount'], num_malicious=num_malicious, noise_variance=args['noise_variance'], check_signature=args['check_signature'], not_resync_chain=args['destroy_tx_in_block'])
+		devices_in_network = DevicesInNetwork(data_set_name=args['dataset'], is_iid=args['IID'], batch_size = args['batchsize'], learning_rate =  args['learning_rate'], loss_func = loss_func, opti = args['optimizer'], num_devices=num_devices, network_stability=args['network_stability'], net=net, dev=dev, knock_out_rounds=args['knock_out_rounds'], lazy_worker_knock_out_rounds=args['lazy_worker_knock_out_rounds'], shard_test_data=args['shard_test_data'], miner_acception_wait_time=args['miner_acception_wait_time'], miner_accepted_transactions_size_limit=args['miner_accepted_transactions_size_limit'], validator_threshold=args['validator_threshold'], pow_difficulty=args['pow_difficulty'], even_link_speed_strength=args['even_link_speed_strength'], base_data_transmission_speed=args['base_data_transmission_speed'], even_computation_power=args['even_computation_power'], malicious_updates_discount=args['malicious_updates_discount'], num_malicious=num_malicious, noise_variance=args['noise_variance'], check_signature=args['check_signature'], not_resync_chain=args['destroy_tx_in_block'])
 		del net
 		devices_list = list(devices_in_network.devices_set.values())
 

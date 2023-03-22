@@ -1,0 +1,5 @@
+device_6 worker B: 0.7497691512107849
+device_10 worker B: 0.7563040256500244
+device_4 worker B: 0.7528275847434998
+device_8 worker B: 0.7511681318283081
+device_5 worker B: 0.7568007111549377

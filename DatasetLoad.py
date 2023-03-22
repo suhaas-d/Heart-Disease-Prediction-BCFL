@@ -3,7 +3,9 @@ import gzip
 import os
 import platform
 import pickle
-
+import pandas as pd
+import torch
+from sklearn import preprocessing
 
 class DatasetLoad(object):
 	def __init__(self, dataSetName, isIID):
@@ -19,10 +21,36 @@ class DatasetLoad(object):
 
 		if self.name == 'mnist':
 			self.mnistDataSetConstruct(isIID)
-		else:
-			pass
+		
+		elif self.name == 'brfss':
+			self.brfssDataSetConstruct(isIID)
 
+	def brfssDataSetConstruct(self, isIID):
+		data_dir = 'data/BRFSS'
+		X_train = np.asarray(pd.read_csv(os.path.join(data_dir, 'X_train.csv')))
+		y_train = np.asarray(pd.read_csv(os.path.join(data_dir, 'y_train.csv')))
+		X_test = np.asarray(pd.read_csv(os.path.join(data_dir, 'X_test.csv')))
+		y_test = np.asarray(pd.read_csv(os.path.join(data_dir, 'y_test.csv')))
+		assert X_train.shape[0] == y_train.shape[0]
+		assert X_test.shape[0] == y_test.shape[0]
 
+		self.train_data_size = X_train.shape[0]
+		self.test_data_size = X_test.shape[0]
+
+		scaler=preprocessing.StandardScaler()
+		X_train=scaler.fit_transform(X_train)
+		X_test=scaler.fit_transform(X_test)
+		X_train=torch.from_numpy(X_train.astype(np.float32))
+		X_test=torch.from_numpy(X_test.astype(np.float32))
+		y_train=torch.from_numpy(y_train.astype(np.float32))
+		y_test=torch.from_numpy(y_test.astype(np.float32))
+		# y_train=y_train.unsqueeze(1).to(torch.float32)
+		# y_test=y_test.unsqueeze(1).to(torch.float32)
+		self.train_data = X_train
+		self.train_label = y_train
+		self.test_data = X_test
+		self.test_label = y_test
+			
 	def mnistDataSetConstruct(self, isIID):
 		data_dir = 'data/MNIST'
 		train_images_path = os.path.join(data_dir, 'train-images-idx3-ubyte.gz')

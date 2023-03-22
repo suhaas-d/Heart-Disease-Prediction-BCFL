@@ -1,0 +1,1 @@
+device_10 worker M noise variances: [0.5800652503967285]
