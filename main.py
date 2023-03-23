@@ -34,7 +34,7 @@ from pathlib import Path
 import shutil
 import torch
 import torch.nn.functional as F
-from Models import Mnist_2NN, Mnist_CNN, BRFSS_NN, LogisticRegression
+from Models import Mnist_2NN, Mnist_CNN, BRFSS_NN, LogisticRegression, BinaryClassification
 from Device import Device, DevicesInNetwork
 from Block import Block
 from Blockchain import Blockchain
@@ -225,6 +225,8 @@ if __name__=="__main__":
 			net = BRFSS_NN()
 		elif args['model_name'] == 'LogisticRegression':
 			net = LogisticRegression()
+		elif args['model_name'] == 'BinaryClassification':
+			net = BinaryClassification()
 
 
 		# 7. assign GPU(s) if available to the net, otherwise CPU
@@ -236,10 +238,21 @@ if __name__=="__main__":
 
 		# 8. set loss_function
 		# loss_func = F.
-		loss_func = torch.nn.BCELoss()
+		# loss_func = torch.nn.BCELoss()
+		loss_func = torch.nn.BCEWithLogitsLoss()
 
 		# 9. create devices in the network
-		devices_in_network = DevicesInNetwork(data_set_name=args['dataset'], is_iid=args['IID'], batch_size = args['batchsize'], learning_rate =  args['learning_rate'], loss_func = loss_func, opti = args['optimizer'], num_devices=num_devices, network_stability=args['network_stability'], net=net, dev=dev, knock_out_rounds=args['knock_out_rounds'], lazy_worker_knock_out_rounds=args['lazy_worker_knock_out_rounds'], shard_test_data=args['shard_test_data'], miner_acception_wait_time=args['miner_acception_wait_time'], miner_accepted_transactions_size_limit=args['miner_accepted_transactions_size_limit'], validator_threshold=args['validator_threshold'], pow_difficulty=args['pow_difficulty'], even_link_speed_strength=args['even_link_speed_strength'], base_data_transmission_speed=args['base_data_transmission_speed'], even_computation_power=args['even_computation_power'], malicious_updates_discount=args['malicious_updates_discount'], num_malicious=num_malicious, noise_variance=args['noise_variance'], check_signature=args['check_signature'], not_resync_chain=args['destroy_tx_in_block'])
+		devices_in_network = DevicesInNetwork(data_set_name=args['dataset'], is_iid=args['IID'],
+					 batch_size = args['batchsize'], learning_rate =  args['learning_rate'], loss_func = loss_func, opti = args['optimizer'],
+					   num_devices=num_devices, network_stability=args['network_stability'], net=net, dev=dev, knock_out_rounds=args['knock_out_rounds'],
+					     lazy_worker_knock_out_rounds=args['lazy_worker_knock_out_rounds'], shard_test_data=args['shard_test_data'],
+						   miner_acception_wait_time=args['miner_acception_wait_time'],
+						     miner_accepted_transactions_size_limit=args['miner_accepted_transactions_size_limit'],
+						     validator_threshold=args['validator_threshold'], pow_difficulty=args['pow_difficulty'],
+							   even_link_speed_strength=args['even_link_speed_strength'],
+							   base_data_transmission_speed=args['base_data_transmission_speed'], even_computation_power=args['even_computation_power'],
+							     malicious_updates_discount=args['malicious_updates_discount'], num_malicious=num_malicious, noise_variance=args['noise_variance'],
+								   check_signature=args['check_signature'], not_resync_chain=args['destroy_tx_in_block'])
 		del net
 		devices_list = list(devices_in_network.devices_set.values())
 

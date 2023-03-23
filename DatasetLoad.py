@@ -6,7 +6,7 @@ import pickle
 import pandas as pd
 import torch
 from sklearn import preprocessing
-
+import pickle
 class DatasetLoad(object):
 	def __init__(self, dataSetName, isIID):
 		self.name = dataSetName
@@ -44,6 +44,8 @@ class DatasetLoad(object):
 		X_test=torch.from_numpy(X_test.astype(np.float32))
 		y_train=torch.from_numpy(y_train.astype(np.float32))
 		y_test=torch.from_numpy(y_test.astype(np.float32))
+		with open('scaler.pkl', 'wb') as f:
+			pickle.dump(scaler, f)
 		# y_train=y_train.unsqueeze(1).to(torch.float32)
 		# y_test=y_test.unsqueeze(1).to(torch.float32)
 		self.train_data = X_train

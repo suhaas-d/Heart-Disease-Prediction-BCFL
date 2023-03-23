@@ -12,7 +12,7 @@ from sys import getsizeof
 # https://cryptobook.nakov.com/digital-signatures/rsa-sign-verify-examples
 from Crypto.PublicKey import RSA
 from hashlib import sha256
-from Models import Mnist_2NN, Mnist_CNN, BRFSS_NN, LogisticRegression
+from Models import Mnist_2NN, Mnist_CNN, BRFSS_NN, LogisticRegression, BinaryClassification
 from Blockchain import Blockchain
 
 class Device:
@@ -814,10 +814,13 @@ class Device:
 				preds = self.net(data)
 				#uncomment for MNIST
 				# arg_preds = torch.argmax(preds, dim=1)
-				roundpreds = torch.round(preds)
+				# roundpreds = torch.round(preds)
+				# For BinaryClassification
+				roundpreds = torch.round(torch.sigmoid(preds))
 				sum_accu += (roundpreds == label).float().mean()
 				num += 1
-			# print(preds)
+			# print("preds  :  ",preds)
+			# print("label : ",label)
 			return sum_accu / num
 
 
@@ -1266,7 +1269,9 @@ class Device:
 					#uncomment for MNIST
 					# preds = torch.argmax(preds, dim=1)
 					#for BRFSS
-					roundpreds = torch.round(preds)
+					# roundpreds = torch.round(preds)
+					# For BinaryClassification
+					roundpreds = torch.round(torch.sigmoid(preds))
 					sum_accu += (roundpreds == label).float().mean()
 					num += 1
 				# print(preds)
