@@ -1,0 +1,3 @@
+device_2 epoch_1 worker B: 0.10650000721216202
+device_2 epoch_2 worker B: 0.10650000721216202
+device_2 epoch_3 worker B: 0.10650000721216202

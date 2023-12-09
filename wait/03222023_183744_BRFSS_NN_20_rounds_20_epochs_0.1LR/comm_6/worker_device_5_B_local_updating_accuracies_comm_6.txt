@@ -1,0 +1,5 @@
+device_5 epoch_1 worker B: 0.8384701013565063
+device_5 epoch_2 worker B: 0.836089551448822
+device_5 epoch_3 worker B: 0.837818443775177
+device_5 epoch_4 worker B: 0.8373692035675049
+device_5 epoch_5 worker B: 0.8361361622810364

@@ -1,0 +1,15 @@
+device_4 epoch_1 worker B: 0.9153557419776917
+device_4 epoch_2 worker B: 0.9127008318901062
+device_4 epoch_3 worker B: 0.9144359230995178
+device_4 epoch_4 worker B: 0.9144548177719116
+device_4 epoch_5 worker B: 0.9149521589279175
+device_4 epoch_6 worker B: 0.9149888753890991
+device_4 epoch_7 worker B: 0.9144271016120911
+device_4 epoch_8 worker B: 0.9105517864227295
+device_4 epoch_9 worker B: 0.9112938642501831
+device_4 epoch_10 worker B: 0.9148865342140198
+device_4 epoch_11 worker B: 0.9141263365745544
+device_4 epoch_12 worker B: 0.9135353565216064
+device_4 epoch_13 worker B: 0.9137231707572937
+device_4 epoch_14 worker B: 0.9136766195297241
+device_4 epoch_15 worker B: 0.9146607518196106

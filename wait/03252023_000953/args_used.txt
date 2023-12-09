@@ -1,0 +1,41 @@
+Command line arguments used -
+-nd 10 -max_ncomm 1000 -ha 5,3,2 -aio 1 -pow 0 -ko 2 -nm 1 -vh 0.08 -cs 0 -B 10 -mn LogisticRegression -iid 0 -lr 0.1 -dtx 1 -op SGD -le 1
+
+All arguments used -
+
+--gpu 0
+--verbose 1
+--save_network_snapshots 0
+--destroy_tx_in_block 1
+--resume_path None
+--save_freq 5
+--save_most_recent 2
+--dataset brfss
+--batchsize 10
+--model_name LogisticRegression
+--learning_rate 0.1
+--optimizer SGD
+--IID 0
+--max_num_comm 1000
+--num_devices 10
+--shard_test_data 0
+--num_malicious 1
+--noise_variance 1
+--default_local_epochs 1
+--unit_reward 1
+--knock_out_rounds 2
+--lazy_worker_knock_out_rounds 10
+--pow_difficulty 0
+--miner_acception_wait_time 0.0
+--miner_accepted_transactions_size_limit 0.0
+--miner_pos_propagated_block_wait_time inf
+--validator_threshold 0.08
+--malicious_updates_discount 0.0
+--malicious_validator_on 0
+--network_stability 1.0
+--even_link_speed_strength 1
+--base_data_transmission_speed 70000.0
+--even_computation_power 1
+--hard_assign 5,3,2
+--all_in_one 1
+--check_signature 0

@@ -1,0 +1,10 @@
+device_5 has successfully identified a malicious worker device device_3 in comm_round 10!
+device_7 has successfully identified a malicious worker device device_3 in comm_round 10!
+device_3 has successfully identified a malicious worker device device_3 in comm_round 10!
+device_1 has successfully identified a malicious worker device device_3 in comm_round 10!
+device_8 has successfully identified a malicious worker device device_3 in comm_round 10!
+device_10 has successfully identified a malicious worker device device_3 in comm_round 10!
+device_2 has successfully identified a malicious worker device device_3 in comm_round 10!
+device_4 has successfully identified a malicious worker device device_3 in comm_round 10!
+device_9 has successfully identified a malicious worker device device_3 in comm_round 10!
+device_6 has successfully identified a malicious worker device device_3 in comm_round 10!

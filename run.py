@@ -1,6 +1,10 @@
 import torch
 import torch.nn as nn
 import pickle
+import os
+import numpy as np
+import pandas as pd
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 # Define your model architecture
 class LogisticRegression(nn.Module):
     def __init__(self):
@@ -36,13 +40,18 @@ with open('/Users/suhaas/Desktop/major_project/Heart_Disease_Prediction_BCFL/SUC
     scaler = pickle.load(f)
 # Load the saved model from file
 model = BinaryClassification()
-model.load_state_dict(torch.load('/Users/suhaas/Desktop/major_project/Heart_Disease_Prediction_BCFL/SUCCESFUL RUNS/Oversampled Data/03232023_231818_BinaryClassification_10_rounds_0.1LR/Global_Model.pt'))
-
+#model.load_state_dict(torch.load('/Users/suhaas/Desktop/major_project/Heart_Disease_Prediction_BCFL/SUCCESFUL RUNS/Oversampled Data/03232023_231818_BinaryClassification_10_rounds_0.1LR/Global_Model.pt'))
+X_test = np.asarray(pd.read_csv('/Users/suhaas/Desktop/major_project/Oversampled Data/X_test.csv'))
+y_test = np.asarray(pd.read_csv('/Users/suhaas/Desktop/major_project/Oversampled Data/y_test.csv'))
+X_test=scaler.fit_transform(X_test)
+y_test=torch.from_numpy(y_test.astype(np.float32))
+X_test=torch.from_numpy(X_test.astype(np.float32))
 
 # Define your input data as a tensor
 inputs = torch.randn(1, 17)
 # print(inputs.dtype)
-inputs = torch.tensor([27.038640227480787,1,0,0,0.0,0.0,0,1,7,3,0,1,1,7.49150142175492,0,0,0])
+# BMI,Smoking,AlcoholDrinking,Stroke,PhysicalHealth,MentalHealth,DiffWalking,Sex,AgeCategory,Race,Diabetic,PhysicalActivity,GenHealth,SleepTime,Asthma,KidneyDisease,SkinCancer
+inputs = torch.tensor([25.84,1,0,0,0.0,0.0,0,1,8,2,0,0,4,3.0,1,0,0])
 inputs = inputs.reshape(1,-1)
 inputs = scaler.transform(inputs)
 print(inputs)
@@ -50,9 +59,13 @@ inputs = torch.tensor(inputs.reshape(1,17))
 inputs = inputs.to(torch.float32)
 # Make a prediction with the loaded model
 model.eval()
-output = model(inputs)
+output = model(X_test)
 
 # Print the output
 # print(output)
 
-print(torch.sigmoid(output))
+# print(torch.sigmoid(output))
+print('Accuracy:', accuracy_score(y_test, torch.round(torch.sigmoid(output)).detach().numpy()))
+print('Precision:', precision_score(y_test, torch.round(torch.sigmoid(output)).detach().numpy()))
+print('Recall:', recall_score(y_test, torch.round(torch.sigmoid(output)).detach().numpy()))
+print('F1 Score:', f1_score(y_test, torch.round(torch.sigmoid(output)).detach().numpy()))

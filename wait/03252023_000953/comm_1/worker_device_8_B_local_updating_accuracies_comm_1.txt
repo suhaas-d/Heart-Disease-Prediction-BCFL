@@ -1,0 +1,1 @@
+device_8 epoch_1 worker B: 0.5002679228782654

@@ -1,0 +1,16 @@
+device_8 worker B: 0.759186327457428
+device_10 worker B: 0.759186327457428
+device_5 worker B: 0.759186327457428
+device_3 worker M: 0.7580214738845825
+device_1 worker B: 0.759186327457428
+device_7 miner B: 0.759186327457428
+device_9 miner B: 0.759186327457428
+device_2 validator B: 0.759186327457428
+device_6 validator B: 0.759186327457428
+device_4 validator B: 0.759186327457428
+comm_round_block_gen_time: 8.93150874481201
+slowest_device_round_ends_time: 9.51307702658517
+mining_consensus: PoS 0
+forking_happened: False
+comm_round_spent_time_on_this_machine: 57.698460817337036
+block_mined_by: device_7 B
